@@ -1,0 +1,80 @@
+# A preliminary investigation of various methods for dealing with missing values. (drop columns, imputation)
+
+missing_val_count_each_col = X_train.isnull().sum()
+print(missing_val_count_each_col[missing_val_count_each_col > 0])
+
+
+# Comparing error from different methods of removing missing values
+def error_missing_val(X_t, X_v, y_t, y_v):
+    #make a Random Forest Regressor model
+    model = RandomForestRegressor(random_state=0)
+    model.fit(X_t, y_t)
+    preds = model.predict(X_v)
+    return mean_absolute_error(y_v, preds)
+
+
+# Dropping columns with missing values
+cols_missing = [col for col in X_train.columns if (X_train[col].isnull().any())]
+
+drop_col_X_train = X_train.drop(cols_missing, axis=1).copy()
+drop_col_X_valid = X_valid.drop(cols_missing, axis=1).copy()
+
+
+# Imputation (Replacing missing values with mean value)
+imputer_1 = SimpleImputer()
+
+imputed_1_X_train = pd.DataFrame(imputer_1.fit_transform(X_train))
+imputed_1_X_valid = pd.DataFrame(imputer_1.transform(X_valid))
+
+imputed_1_X_train.columns = X_train.columns
+imputed_1_X_valid.columns = X_valid.columns
+
+
+# Imputation (Replacing missing values with median column value)
+imputer_2 = SimpleImputer(strategy='median')
+
+imputed_2_X_train = pd.DataFrame(imputer_2.fit_transform(X_train))
+imputed_2_X_valid = pd.DataFrame(imputer_2.transform(X_valid))
+
+imputed_2_X_train.columns = X_train.columns
+imputed_2_X_valid.columns = X_valid.columns
+
+
+# Imputation (Replacing missing values with most frequent column value)
+imputer_3 = SimpleImputer(strategy='most_frequent')
+
+imputed_3_X_train = pd.DataFrame(imputer_3.fit_transform(X_train))
+imputed_3_X_valid = pd.DataFrame(imputer_3.transform(X_valid))
+
+imputed_3_X_train.columns = X_train.columns
+imputed_3_X_valid.columns = X_valid.columns
+[112]:
+
+
+# Imputation (Replacing missing values with min column value)
+imputed_4_X_train = X_train.copy()
+imputed_4_X_valid = X_valid.copy()
+
+for col in cols_missing:
+    min = imputed_4_X_train[col].min()
+    imputed_4_X_train[col] = imputed_4_X_train[col].fillna(value=min)
+    imputed_4_X_valid[col] = imputed_4_X_valid[col].fillna(value=min)
+
+
+# Imputation (Replacing missing values with min column value)
+imputer_5 = SimpleImputer(strategy='constant')
+
+imputed_5_X_train = pd.DataFrame(imputer_5.fit_transform(X_train))
+imputed_5_X_valid = pd.DataFrame(imputer_5.transform(X_valid))
+
+imputed_5_X_train.columns = X_train.columns
+imputed_5_X_valid.columns = X_valid.columns
+
+
+# Calculating error
+print(f"MAE (Dropping Columns): \n{error_missing_val(drop_col_X_train, drop_col_X_valid, y_train, y_valid)}")
+print(f"MAE (Impute Mean): \n{error_missing_val(imputed_1_X_train, imputed_1_X_valid, y_train, y_valid)}")
+print(f"MAE (Impute Median): \n{error_missing_val(imputed_2_X_train, imputed_2_X_valid, y_train, y_valid)}")
+print(f"MAE (Impute MF): \n{error_missing_val(imputed_3_X_train, imputed_3_X_valid, y_train, y_valid)}")
+print(f"MAE (Impute Min): \n{error_missing_val(imputed_4_X_train, imputed_4_X_valid, y_train, y_valid)}")
+print(f"MAE (Impute 0): \n{error_missing_val(imputed_5_X_train, imputed_5_X_valid, y_train, y_valid)}")
