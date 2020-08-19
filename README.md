@@ -1,5 +1,5 @@
 # kaggle
-Includes Jupiter notebooks (python) and snippets of code showing my process of improving simple machine learning models I completed with the help of Kaggle courses. This is a continuation of my machine learning and data science journey.
+Includes Jupiter notebooks (python) and snippets of code showing my process of improving simple machine learning models I completed with the help of Kaggle courses. This is my first time using python.
 
 ### Intro/Intermediate Machine Learning
 
